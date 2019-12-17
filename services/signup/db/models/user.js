@@ -1,4 +1,6 @@
 'use strict';
+const bcrypt = require('bcrypt')
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     email: DataTypes.STRING,
@@ -15,10 +17,13 @@ module.exports = (sequelize, DataTypes) => {
         return JSON.setDataValue('roles', JSON.stringify(rolesObj))
       }
     },
-    lastRole: DataTypes.STRING
+    lastRole: DataTypes.INTEGER
   }, {});
   User.associate = function(models) {
     // associations can be defined here
   };
   return User;
 };
+
+
+

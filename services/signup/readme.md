@@ -1,4 +1,4 @@
-Signup Service
+Signup Service :
 
 1. users post to a generic signup api endpoint with basic info, and roles it needs accessed to.
     
@@ -9,4 +9,13 @@ Signup Service
 4. contain endpoints to handle all auth related service: 
     verifying otp on signup
     generating and verifying jwt tokens
+
+Routes :
+
+POST /user -> create user
+Get /user/:id -> send user(id)
+
+GET /user/auth -> generates jwt token
+GET /user/auth/verify -> verify jwt token
+
 
