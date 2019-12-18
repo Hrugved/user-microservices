@@ -4,11 +4,10 @@ module.exports = {
     register: async(req,res) => { 
         let email = req.body.email,
         password = req.body.password,
-        dateOfBirth = req.body.dateOfBirth,
+        dateOfBirth = req.body.dateOfBirth, // JS default mm-dd-yy
         roles = req.body.roles   
-        
-        const existingUser = await this.findUser(email)
 
+        const existingUser = await findUser(req.models.user,email)
         if(existingUser) {
             return res.status(200).json({
                 status : false,
@@ -16,8 +15,8 @@ module.exports = {
             })
         }
 
-        password = await bcrypt.hashPassword(password,8)
-        roles = roles.map(role => req.contants.ROLES[role])
+        password = await bcrypt.hash(password,8)
+        roles = roles.map(role => req.constants.ROLES[role.toUpperCase()])
         try{
             const user = await req.models.user.create({
                 email,
@@ -39,17 +38,22 @@ module.exports = {
         }
     },
 
-    verify: async(req,res) => {
+    verifyUser: async(req,res) => {
+        // console.log('hit', req.body)
         const {email,password} = req.body
         try{
-            const user = await this.findUser(email)
+            const user = await findUser(req.models.user,email)
             if(user && bcrypt.compare(password,user.password)) {
-                res.status(200).json({
+                return res.json({
                     status: true,
-                    user
+                    user: {
+                        email: user.email,
+                        role: user.lastRole,
+                        permissions: user.roles
+                    }
                 })
             }
-            return res.status(404).json({
+            return res.json({
                 status: false,
                 message: "User doesn't exist"
             })
@@ -61,12 +65,12 @@ module.exports = {
             })
         }
     },
+}
 
-    findUser: async (email) => {
-        return await req.models.user.findOne({
-            where : {
-                email
-            }
-        });
-    }
+const findUser =  async (user, email) => {
+    return await user.findOne({
+        where : {
+            email
+        }
+    });
 }

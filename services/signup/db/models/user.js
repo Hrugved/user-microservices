@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         return JSON.parse(this.getDataValue('roles'))
       },
       set: function (rolesObj) {
-        return JSON.setDataValue('roles', JSON.stringify(rolesObj))
+        this.setDataValue('roles', JSON.stringify(rolesObj))
       }
     },
     lastRole: DataTypes.INTEGER

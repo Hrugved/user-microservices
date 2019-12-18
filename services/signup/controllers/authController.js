@@ -1,38 +1,44 @@
-const jwt = require('jsonwebtoken')
-const secret = 'thisisasecret'
+const jwt = require("jsonwebtoken");
+const secret = "thisisasecret";
 
-module.exports.generateToken(username => {
+module.exports = {
+  generateToken: (req, res) => {
+    const { email } = req.body;
     const payload = {
-        username
-    }
+      email
+    };
     const options = {
-        expiresIn: "365d",
-    }   
-    const token = jwt.sign(payload, secret, options)
-})
+      expiresIn: "365d"
+    };
+    const token = jwt.sign(payload, secret, options);
+    return res.json({
+      token
+    });
+  },
 
-module.exports.verifyToken((req,res,next) => {
-    const token = req.header['x-access-token'] || req.header['authorization']
-    if(token.startsWith('Bearer ')){
-        token = token.slice(7, token.length)
+  verifyToken: (req, res) => {
+    const token = req.header["x-access-token"] || req.header["authorization"];
+    if (token.startsWith("Bearer ")) {
+      token = token.slice(7, token.length);
     }
-    if(token) {
-        json.verify(token, secret, (err,decoded) => {
-            if(err) {
-                return res.json({
-                    message: 'Auth token is invalid',
-                    success: false
-                })
-            }
-            else { 
-                req.decoded = decoded
-                next()
-            }
-        })
-    } else {
-        return res.json({
-            message: 'Auth token is not supplied',
+    if (token) {
+      jwt.verify(token, secret, (err, decoded) => {
+        if (err) {
+          return res.json({
+            message: "Auth token is invalid",
             success: false
-        })
+          });
+        }
+        return res.json({
+          decoded,
+          success: true
+        });
+      });
+    } else {
+      return res.json({
+        message: "Auth token is not supplied",
+        success: false
+      });
     }
-})
+  }
+};
