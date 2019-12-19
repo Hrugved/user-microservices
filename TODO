@@ -1,0 +1,28 @@
+db: 
+    - unique email
+    - emailVerified defaults to false
+
+token: 
+    - email verification token expire in 10 min
+    - email verification token expire after usage
+
+Docker:
+    Dockerfile:
+        - email
+        - login
+        - signup
+        - password
+    docker-compose:
+        - email
+        - login
+        - signup
+        - password
+        - sql db
+
+login:
+    - login not permitted if emailVerified:false
+
+service: 
+    password:
+        - forgot password
+        - password reset

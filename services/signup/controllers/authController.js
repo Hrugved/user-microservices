@@ -1,39 +1,42 @@
-const jwt = require("jsonwebtoken");
-const secret = "thisisasecret";
+const auth = require('../utils/jwt')
 
 module.exports = {
-  generateToken: (req, res) => {
+  getToken: async (req, res) => {
     const { email } = req.body;
-    const payload = {
-      email
-    };
-    const options = {
-      expiresIn: "365d"
-    };
-    const token = jwt.sign(payload, secret, options);
-    return res.json({
-      token
-    });
+    try {
+      const token = await auth.generateToken(email)
+      return res.json({
+        token
+      });
+    }
+    catch(err) {
+      console.log(err)
+      return res.status(500).json({
+        message: 'authentication failed'
+      })
+    }
   },
 
-  verifyToken: (req, res) => {
+  verifyToken: async (req, res) => {
     const token = req.header["x-access-token"] || req.header["authorization"];
     if (token.startsWith("Bearer ")) {
       token = token.slice(7, token.length);
     }
     if (token) {
-      jwt.verify(token, secret, (err, decoded) => {
-        if (err) {
-          return res.json({
-            message: "Auth token is invalid",
-            success: false
-          });
-        }
+      try {
+        const decoded = await auth.checkToken(token)
         return res.json({
           decoded,
           success: true
         });
-      });
+      }
+      catch(err) {
+        return res.json({
+          message: "Auth token is invalid",
+          success: false
+        });
+      }
+
     } else {
       return res.json({
         message: "Auth token is not supplied",
@@ -42,3 +45,4 @@ module.exports = {
     }
   }
 };
+

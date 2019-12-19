@@ -13,8 +13,11 @@ router.post('/', user.register)
 // get user
 router.get('/', user.verifyUser)
 
+// email verification
+router.get('/verification', user.emailVerification)
+
 // authorize user
-router.get('/authorize', auth.generateToken)
+router.get('/authorize', auth.getToken)
 
 // verify user
 router.get('/verify', auth.verifyToken)

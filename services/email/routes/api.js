@@ -4,6 +4,6 @@ const user = require('../controllers/userController')
 router.post('/ping', (req,res) => res.send('pong'))
 
 // login
-router.post('/', user.login)
+router.post('/verification', user.sendVerificationMail)
 
 module.exports = router
