@@ -6,4 +6,6 @@ router.post('/ping', (req,res) => res.send('pong'))
 // login
 router.post('/verification', user.sendVerificationMail)
 
+router.post('/reset_password', user.sendResetPasswordMail)
+
 module.exports = router

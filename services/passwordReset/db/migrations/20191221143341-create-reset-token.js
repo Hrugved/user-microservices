@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+    return queryInterface.createTable('resetTokens', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,23 +12,7 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
-      emailVerified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      dateOfBirth: {
-        type: Sequelize.DATEONLY
-      },
-      status: {
-        type: Sequelize.INTEGER
-      },
-      password: {
-        type: Sequelize.STRING
-      },
-      roles: {
-        type: Sequelize.STRING,
-      },
-      lastRole: {
+      token: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -42,6 +26,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable('resetTokens');
   }
 };

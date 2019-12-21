@@ -1,11 +1,11 @@
 const jwt = require("jsonwebtoken");
 const secret = "thisisasecret";
 
-module.exports.generateToken = (email) => {
+module.exports.generateToken = (email, expiresIn = "365d") => {
     
     return new Promise((resolve,reject) => {
         const payload = { email }
-        const options = { expiresIn: "365d" }
+        const options = { expiresIn }
         jwt.sign(payload, secret, options, (err,token) => {
             if(err) reject(err)
             resolve(token)

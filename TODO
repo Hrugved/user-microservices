@@ -1,10 +1,9 @@
 db: 
-    - unique email
-    - emailVerified defaults to false
+    ✔ unique email @done(19-12-20 02:55)
+    ✔ emailVerified defaults to false @done(19-12-20 02:55)
 
 token: 
-    - email verification token expire in 10 min
-    - email verification token expire after usage
+    ✔ email verification token expire in 10 min @done(19-12-20 03:00)
 
 Docker:
     Dockerfile:
@@ -20,9 +19,13 @@ Docker:
         - sql db
 
 login:
-    - login not permitted if emailVerified:false
+    ✔ login not permitted if emailVerified:false @done(19-12-20 02:55)
 
 service: 
     password:
-        - forgot password
         - password reset
+     
+cleanup:
+    - check status codes
+    - check res
+    - check return res

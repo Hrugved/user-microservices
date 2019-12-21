@@ -9,7 +9,7 @@ module.exports = {
             // check user credentials
             let options = {
                 method: 'GET',
-                uri: signupService,
+                uri: `${signupService}/verify`,
                 body: {
                     email,
                     password
@@ -17,7 +17,7 @@ module.exports = {
                 json: true
             }
             let response = await rp(options)
-            if(!response.status) {
+            if(!(response.status && response.user.emailVerified)) {
                 return res.json(response)
             }
             // get auth token
@@ -32,15 +32,9 @@ module.exports = {
                 json: true
             }
             response = await rp(options)
-            const _permissions = []
-            for(let rol in constants.ROLES){
-                if(permissions.includes(constants.ROLES[rol])) {
-                    _permissions.push(rol)
-                }
-            }
             res.json({
                 role,
-                _permissions,
+                permissions,
                 token: response.token
             })
         } catch(err) {

@@ -7,23 +7,23 @@ const emailService = 'http://localhost:3002'
 
 module.exports = {
     register: async(req,res) => { 
-        let email = req.body.email,
-        password = req.body.password,
-        dateOfBirth = moment(req.body.dateOfBirth, "MM-DD-YY"),
-        roles = req.body.roles   
-        
-        dateOfBirth = moment(dateOfBirth, "MM-DD-YY")
-        const existingUser = await findUser(req.models.user,email)
-        if(existingUser) {
-            return res.status(200).json({
-                status : false,
-                message : "User already exists"
-            })
-        }
-        
-        password = await bcrypt.hash(password,8)
-        roles = roles.map(role => req.constants.ROLES[role.toUpperCase()])
-        try{
+        try {
+            let email = req.body.email,
+            password = req.body.password,
+            dateOfBirth = moment(req.body.dateOfBirth, "MM-DD-YY"),
+            roles = req.body.roles   
+            
+            dateOfBirth = moment(dateOfBirth, "MM-DD-YY")
+            const existingUser = await req.models.user.findOne({ where: {email}})
+            if(existingUser) {
+                return res.status(200).json({
+                    status : false,
+                    message : "User already exists"
+                })
+            }
+
+            password = await bcrypt.hash(password,8)
+            roles = roles.map(role => req.constants.ROLES[role.toUpperCase()])
             await req.models.user.create({
                 email,
                 password,
@@ -41,44 +41,40 @@ module.exports = {
             console.log(err)
             return res.status(500).json({
                 status : false,
-                message : "Cannot create users"
+                message : "Cannot create user"
             })
         }
     },
 
-    verifyUser: async(req,res) => {
-        const {email,password} = req.body
+    find: async (req,res) => {
+        const {options} = req.body
         try{
-            const user = await findUser(req.models.user,email)
-            if(user && bcrypt.compare(password,user.password)) {
+            const user = req.models.user.findOne({where: {options}})
+            if(!user) {
                 return res.json({
-                    status: true,
-                    user: {
-                        email: user.email,
-                        role: user.lastRole,
-                        permissions: user.roles
-                    }
+                    success: false,
+                    message: 'no such user exists'
                 })
             }
-            return res.json({
-                status: false,
-                message: "User doesn't exist"
+            res.json({
+                success: true,
+                user: {
+                    email: user.email,
+                }
             })
         } catch(err) {
-            console.log(err)
-            return res.status(500).json({
-                status: false,
-                message: 'server error'
+            res.status(500).json({
+                success: false,
+                message: 'cant find user'
             })
         }
     },
 
     emailVerification: async (req,res) => {
-        console.log('hit', req.query)
         const {token, email} = req.query
         try {
             await auth.checkToken(token)
-            const user = await findUser(req.models.user,email)
+            const user = await req.models.user.findOne({ where: {email}})
             if(!user) {
                 throw err
             }
@@ -92,25 +88,38 @@ module.exports = {
         }
         catch(err) {
             console.log(err)
-            res.status(404).send({
+            res.status(404).json({
                 status: false,
                 message: 'Email verification failed'
             })
         } 
-    }
-}
+    },
 
-const findUser =  async (user, email) => {
-    return await user.findOne({
-        where : {
-            email
+    updateUser: async (req,res) => {
+        try {
+            const {email,updates} = req.body
+            const allowedUpdates = ['emailVerified','password','dateOfBirth','status','roles','lastRole']
+            for(let field in updates) {
+                if(!allowedUpdates.includes(field)) {
+                    delete updates[field]
+                }
+            }
+            if('password' in updates) {
+                updates['password'] = await bcrypt.hash(updates['password'],8)
+            }
+            await req.models.user.update(updates, {where:{email}}) 
+            res.json({success: true})
         }
-    });
+        catch(err) {
+            console.log(err)
+            res.status(500).json({success: false})
+        }
+    } 
 }
 
 const sendVerificationMail = async (email) => {
     try {
-        const token = await auth.generateToken(email)
+        const token = await auth.generateToken(email, '10m')
         const options = {
             method: 'POST',
             uri: `${emailService}/verification`,

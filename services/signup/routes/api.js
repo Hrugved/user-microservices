@@ -5,21 +5,27 @@ const requestFeeder = require('../helpers/requestFeeder')
 
 router.use(requestFeeder)
 
-router.post('/ping', (req,res) => res.send('pong'))
+router.get('/ping', (req,res) => res.send('pong'))
 
 // signup
 router.post('/', user.register)
 
 // get user
-router.get('/', user.verifyUser)
+router.get('/', user.find)
+
+// update user
+router.update('/', user.updateUser)
 
 // email verification
 router.get('/verification', user.emailVerification)
 
+// verify user
+router.get('/verify', auth.verifyUser)
+
 // authorize user
 router.get('/authorize', auth.getToken)
 
-// verify user
-router.get('/verify', auth.verifyToken)
+// verify token
+router.get('/check', auth.verifyToken)
 
 module.exports = router
