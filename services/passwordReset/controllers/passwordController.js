@@ -11,16 +11,21 @@ module.exports = {
       let options = {
         method: 'GET',
         uri: signupService,
-        body: {email},
+        body: {options: {email}},
         json: true
       }
       let response = await rp(options)
+      console.log(response.success)
       if(!response.success) {
         return res.json({
           success: false,
           message: 'no such user exits'
         })
       }
+      // delete old token 
+      await req.models.resetToken.destroy({
+        where: {email}
+      })
       // get auth token
       options = {
         method: 'GET',
@@ -55,9 +60,11 @@ module.exports = {
     try {
       const {email,token,password} = req.body
       // check if token exists
-      let entry = req.models.resetToken.findOne({
-        token,
-        email
+      let p1 = req.models.resetToken.findOne({
+        where: {
+          token,
+          email
+        }
       })
       // check if token is valid
       let options = {
@@ -66,8 +73,8 @@ module.exports = {
         qs: {token},
         json: true
       }
-      let response = rp(options)
-      [entry, response] = await Promise.all(entry,response)
+      let p2 = rp(options)
+      let [entry, response] = await Promise.all([p1,p2])
       if(!(entry && response.success)) {
         return res.status(404).json({
           success: false,
@@ -75,11 +82,11 @@ module.exports = {
         })
       }
       options = {
-        method: 'UPDATE',
+        method: 'PUT',
         uri: `${signupService}`,
         body: {
           email,
-          options: {password}
+          updates: {password}
         },
         json: true
       }

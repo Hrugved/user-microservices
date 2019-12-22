@@ -49,17 +49,19 @@ module.exports = {
     find: async (req,res) => {
         const {options} = req.body
         try{
-            const user = req.models.user.findOne({where: {options}})
+            const user = await req.models.user.findOne({where: options})
+            // console.log(user)
             if(!user) {
                 return res.json({
                     success: false,
                     message: 'no such user exists'
                 })
             }
+            console.log(user)
             res.json({
                 success: true,
                 user: {
-                    email: user.email,
+                    email: user.email
                 }
             })
         } catch(err) {
@@ -97,17 +99,18 @@ module.exports = {
 
     updateUser: async (req,res) => {
         try {
-            const {email,updates} = req.body
+            const {user,updates} = req.body
             const allowedUpdates = ['emailVerified','password','dateOfBirth','status','roles','lastRole']
             for(let field in updates) {
                 if(!allowedUpdates.includes(field)) {
                     delete updates[field]
                 }
             }
-            if('password' in updates) {
+            if(updates['password']) {
                 updates['password'] = await bcrypt.hash(updates['password'],8)
             }
-            await req.models.user.update(updates, {where:{email}}) 
+
+            await req.models.user.update(updates, {where:user}) 
             res.json({success: true})
         }
         catch(err) {
@@ -119,6 +122,7 @@ module.exports = {
 
 const sendVerificationMail = async (email) => {
     try {
+        // console.log(email)
         const token = await auth.generateToken(email, '10m')
         const options = {
             method: 'POST',

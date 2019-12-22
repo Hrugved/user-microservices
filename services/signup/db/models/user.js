@@ -17,10 +17,12 @@ module.exports = (sequelize, DataTypes) => {
     roles: {
       type: DataTypes.STRING,
       get: function() {
+        // return this.getDataValue('roles').split(';')
         return JSON.parse(this.getDataValue('roles'))
       },
-      set: function (rolesObj) {
-        this.setDataValue('roles', JSON.stringify(rolesObj))
+      set: function (val) {
+        // this.setDataValue('roles', val.join(';'))
+        return this.setDataValue('roles', JSON.stringify(val));
       }
     },
     lastRole: DataTypes.INTEGER

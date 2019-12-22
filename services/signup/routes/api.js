@@ -14,7 +14,7 @@ router.post('/', user.register)
 router.get('/', user.find)
 
 // update user
-router.update('/', user.updateUser)
+router.put('/', user.updateUser)
 
 // email verification
 router.get('/verification', user.emailVerification)

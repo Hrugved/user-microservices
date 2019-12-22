@@ -1,5 +1,8 @@
 const router = require('express').Router()
-const user = require('../controllers/passwordController')
+const password = require('../controllers/passwordController')
+const requestFeeder = require('../helpers/requestFeeder')
+
+router.use(requestFeeder)
 
 router.post('/ping', (req,res) => res.send('pong'))
 
