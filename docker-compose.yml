@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+    
+    db:
+        container_name: db
+        build:
+            context: ./services/db
+            dockerfile: Dockerfile.dev
+        volumes:
+            - data:/var/lib/mysql
+        environment: 
+            MYSQL_ROOT_PASSWORD: mysql_password # default user: root
+        ports:
+            - 8080:3306 # mysql workbench -> host: localhost:8080, user: root, password: mysql_password 
+
+    signup:
+        container_name: signup
+        build:
+            context: ./services/signup
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3000:3000
+        volumes:
+            - /app/node_modules
+            - ./services/signup:/app
+        depends_on:
+            - db
+
+    login:
+        container_name: login
+        build:
+            context: ./services/login
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3001:3001
+        volumes:
+            - /app/node_modules
+            - ./services/login:/app
+
+    email:
+        container_name: email
+        build:
+            context: ./services/email
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3002:3002
+        volumes:
+            - /app/node_modules
+            - ./services/email:/app
+        env_file: 
+            - ./services/email/config/dev.env
+            
+
+    password_reset:
+        container_name: password_reset
+        build:
+            context: ./services/passwordReset
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3003:3003
+        volumes:
+            - /app/node_modules
+            - ./services/passwordReset:/app
+        depends_on:
+            - db
+    
+        
+volumes:
+    data:
+        # login signup forgotpass/resetpass 
+        # abhi ke liye sirf ek login ko leke chalo, ex. jobseeker
+        # ask utkarsh about how node code should look like : ex. database by migrations or simple, login system
+        # code acha likna hai
+        # daily report on progress

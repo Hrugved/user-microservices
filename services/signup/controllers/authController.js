@@ -1,4 +1,5 @@
 const auth = require('../utils/jwt')
+const bcrypt = require('bcryptjs')
 
 module.exports = {
 

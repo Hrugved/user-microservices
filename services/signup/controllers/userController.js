@@ -1,9 +1,9 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const auth = require('../utils/jwt')
 const rp = require('request-promise')
 const moment = require('moment')
 
-const emailService = 'http://localhost:3002'
+const emailService = 'http://email:3002'
 
 module.exports = {
     register: async(req,res) => { 

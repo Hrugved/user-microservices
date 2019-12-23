@@ -4,7 +4,7 @@ const requestFeeder = require('../helpers/requestFeeder')
 
 router.use(requestFeeder)
 
-router.post('/ping', (req,res) => res.send('pong'))
+router.get('/ping', (req,res) => res.send('pong'))
 
 router.post('/reset_password', password.reset)
 

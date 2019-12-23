@@ -1,8 +1,8 @@
 const rp = require('request-promise')
 const sgMail = require('@sendgrid/mail')
 
-const signupService = 'http://localhost:3000'
-const passwordService = 'http://localhost:3003'
+const signupService = 'http://signup:3000'
+const passwordResetService = 'http://password_reset:3003'
 
 module.exports = {
     sendVerificationMail: (req,res) => {
@@ -11,7 +11,7 @@ module.exports = {
             to: email,
             from: 'no-reply@crackhire.com',
             subject: 'Verify Your Email',
-            html: `Click <a href="${signupService}/verification?token=${token}&email=${email}">here</a> to verify your email `
+            html: `Click ${signupService}/verification?token=${token}&email=${email} to verify your email `
           };
           sgMail.send(msg);
           res.end()
@@ -23,7 +23,7 @@ module.exports = {
             to: email,
             from: 'no-reply@crackhire.com',
             subject: 'Reset password link',
-            html: `Click ${passwordService}/set_password?token=${token}&email=${email} to verify your email `
+            html: `Click ${passwordResetService}/set_password?token=${token}&email=${email} to reset your password `
           };
           sgMail.send(msg);
           res.end() 

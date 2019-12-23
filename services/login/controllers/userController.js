@@ -1,6 +1,6 @@
 const rp = require('request-promise')
-const constants = require('../constants')
-const signupService = 'http://localhost:3000'
+
+const signupService = 'http://signup:3000'
 
 module.exports = {
     login: async (req,res) => {

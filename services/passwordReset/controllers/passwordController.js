@@ -1,7 +1,7 @@
 const rp = require('request-promise')
 
-const signupService = 'http://localhost:3000'
-const emailService = 'http://localhost:3002'
+const signupService = 'http://signup:3000'
+const emailService = 'http://email:3002'
 
 module.exports = {
   reset: async (req,res) => {
