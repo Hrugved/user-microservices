@@ -1,8 +1,8 @@
 const rp = require('request-promise')
 const sgMail = require('@sendgrid/mail')
 
-const signupService = 'http://signup:3000'
-const passwordResetService = 'http://password_reset:3003'
+const signupService = 'http://localhost:3000'
+const passwordResetService = 'http://localhost:3003'
 
 module.exports = {
     sendVerificationMail: (req,res) => {
