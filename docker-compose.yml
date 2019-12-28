@@ -44,7 +44,7 @@ services:
             context: ./services/email
             dockerfile: Dockerfile.dev
         ports:
-            - 3002:3002
+            - 3004:3004
         volumes:
             - /app/node_modules
             - ./services/email:/app
@@ -58,13 +58,23 @@ services:
             context: ./services/passwordReset
             dockerfile: Dockerfile.dev
         ports:
-            - 3003:3003
+            - 3002:3002
         volumes:
             - /app/node_modules
             - ./services/passwordReset:/app
         depends_on:
             - db
     
+    auth:
+        container_name: auth 
+        build:
+            context: ./services/auth
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3003:3003
+        volumes:
+            - /app/node_modules
+            - ./services/auth:/app
         
 volumes:
     data:

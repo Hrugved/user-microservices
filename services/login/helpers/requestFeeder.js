@@ -1,5 +1,5 @@
 const connection = require('../db/connection')
-const constants = require('../constants')
+const constants = require('../../signup/constants')
 
 module.exports = async (req,res,next) => {
     try {
