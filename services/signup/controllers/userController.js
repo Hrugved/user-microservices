@@ -4,7 +4,7 @@ const services = require('../services')
 module.exports = {
     register: async(req,res) => { 
         try {
-            const response = await createUser({
+            const response = await createUserHandler({
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password,
@@ -12,8 +12,8 @@ module.exports = {
             });
             
             // TODO create sendOtp func
-            sendOtp(phone)
-            sendVerificationMail(email)
+            sendOtpHandler(phone)
+            sendVerificationMailHandler(email)
 
             return res.status(200).json({
                     status : true,
@@ -22,7 +22,7 @@ module.exports = {
         }
 
         catch(err) {
-            if(err.statusCode == 404) {
+            if(err.statusCode === '404') {
                 return res.status(404).send({
                     status: false,
                     message: 'User is already regitered'
@@ -34,18 +34,35 @@ module.exports = {
             })
         }
     },
-}
 
+    verifyOtp: async(req,res) => {
+        try {
+            const {phone,otp} = req.body
+            await verifyOtpHandler(phone,otp)
+            await updateUserStatusHandler(phone)
+        } catch(err) {
+            if(err.statusCode === '400') {
+                return res.json(404).json({
+                    status: false,
+                    message: 'invalid otp'
+                })
+            }
+            console.log('error')
+            return res.status(500).json({
+                status: false,
+                message: 'service error'
+            })
+        }
+    }
+}
 
 // helpers
 
-const sendVerificationMail = async (email) => {
+const sendVerificationMailHandler = async (email) => {
     try {
-        // TODO create generateToken
-        const token = await auth.generateToken(email, '10m')
         const options = {
-            method: 'POST',
-            uri: `${services.email}/verification`,
+            method: 'GET',
+            uri: `${services.email}/send_verification`,
             body: {
                 email
             },
@@ -56,4 +73,57 @@ const sendVerificationMail = async (email) => {
     catch(err) {
         console.log(err)
     }
+}
+
+const sendOtpHandler = async(phone) => {
+    const options = {
+        method: 'GET',
+        uri: `${services.sms}/send_otp`,
+        body: {
+            phone
+        },
+        json: true
+    }
+    return rp(options)
+}
+
+const verifyOtpHandler = async(phone,otp) => {
+    const options = {
+        method: 'GET',
+        uri: `${services.sms}/verify_otp`,
+        body: {
+            phone,
+            otp
+        },
+        json: true
+    }
+    return rp(options)
+}
+
+const createUserHandler = async(user) => {
+    const options = {
+        method: 'POST',
+        uri: services.login,
+        body: {
+            ...user
+        },
+        json: true
+    }
+    return rp(options)
+}
+
+const updateUserStatusHandler = async(phone) => {
+    const options = {
+        method: 'PUT',
+        uri: services.login,
+        body: {
+            user: {
+                phone
+            }, updates: {
+                status: 1
+            }
+        },
+        json: true
+    }
+    return rp(options)
 }

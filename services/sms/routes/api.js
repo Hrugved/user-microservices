@@ -3,16 +3,8 @@ const user = require('../controllers/userController')
 
 router.get('/ping', (req,res) => res.send('pong'))
 
-// login
-router.post('/login', user.login)
+router.get('/send_otp', user.sendOtp)
 
-// signup
-router.post('/', user.create)
-
-// get user
-router.get('/', user.find)
-
-// update user
-router.put('/', user.update)
+router.get('/verify_otp', user.verifyOtp)
 
 module.exports = router

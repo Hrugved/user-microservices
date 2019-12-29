@@ -75,7 +75,20 @@ services:
         volumes:
             - /app/node_modules
             - ./services/auth:/app
-        
+
+    sms:
+        container_name: sms
+        build:
+            context: ./services/sms
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3005:3005
+        volumes:
+            - /app/node_modules
+            - ./services/sms:/app
+        env_file: 
+            - ./services/sms/config/dev.env
+
 volumes:
     data:
         # login signup forgotpass/resetpass 

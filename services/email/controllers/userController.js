@@ -26,7 +26,7 @@ module.exports = {
         const {token, email} = req.query
         try {
             const response = await checkToken(token)
-            await emailVerifiedhandler()
+            await emailVerifiedHandler(email)
             res.json({
                 status: true,
                 message: 'Email verified successfully'
@@ -90,7 +90,7 @@ const checkToken = async (email) => {
     return await rp(options)
 }
 
-const emailVerifiedhandler = async (email) => {
+const emailVerifiedHandler = async (email) => {
     options = {
         method: 'PUT',
         uri: services.login,

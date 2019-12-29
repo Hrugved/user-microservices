@@ -112,7 +112,6 @@ module.exports = {
         }
     },
 
-    // TODO response with no. of users affected
     update: async (req,res) => {
         try {
             const {user,updates} = req.body
@@ -126,8 +125,8 @@ module.exports = {
                 updates['password'] = await bcrypt.hash(updates['password'],8)
             }
 
-            await req.models.user.update(updates, {where:user}) 
-            res.json({success: true})
+            const users = await req.models.user.update(updates, {where:user}) 
+            res.json({status: true, users: users.length})
         }
         catch(err) {
             console.log(err)
@@ -138,22 +137,3 @@ module.exports = {
 
 
 // helpers
-
-const sendVerificationMail = async (email) => {
-    try {
-        const token = await auth.generateToken(email, '10m')
-        const options = {
-            method: 'POST',
-            uri: `${emailService}/verification`,
-            body: {
-                email,
-                token
-            },
-            json: true
-        }
-        rp(options) 
-    }
-    catch(err) {
-        console.log(err)
-    }
-}
