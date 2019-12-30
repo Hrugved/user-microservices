@@ -5,18 +5,23 @@ module.exports = {
         try{
             const {phone} = req.body
             console.log(`+91${phone}`)
-            let user = await req.models.otp.findOrCreate({
-                phone
+            let users = await req.models.otp.findOrCreate({
+                where: {
+                    phone
+                }
             })
+            let user = users[0]
             // six digit number
             const otp = Math.floor(Math.random() * 900000) + 100000;
-            console.log('otp: ', otp)
-            await user.update({ otp, otpCreatedAt: Date.now() })
-            await req.client.messages.create({
-                body: `Your otp for crackhire account is ${otp}`,
-                from: process.env.TWILIO_PHONE,
-                to: `+91${phone}`
+            await user.update({ 
+                otp, 
+                otpCreatedAt: Date.now() 
             })
+            // await req.client.messages.create({
+            //     body: `Your otp for crackhire account is ${otp}`,
+            //     from: process.env.TWILIO_PHONE,
+            //     to: `+91${phone}`
+            // })
             res.json({
                 status: true,
                 message: 'otp sent successfully',
@@ -24,9 +29,15 @@ module.exports = {
             })
         } catch(err) {
             console.error(err)
-            res.status(400).json({
+            if(err.statusCode === 400){
+                res.status(400).json({
+                    status: false,
+                    message: 'cannot sent otp, please check if phone-number is valid'
+                })
+            }
+            res.status(500).json({
                 status: false,
-                message: 'cannot sent otp, please check if phone-number is valid'
+                message: 'service failure'
             })
         }
     },

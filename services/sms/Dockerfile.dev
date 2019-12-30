@@ -2,5 +2,6 @@ FROM node:alpine
 WORKDIR /app
 COPY ./package.json .
 RUN npm i
+RUN npm i sequelize-cli -g
 COPY . .
 CMD [ "npm", "run", "dev" ]

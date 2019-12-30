@@ -6,14 +6,16 @@ const emailUrl = 'localhost:3004/check_verification'
 
 module.exports = {
     sendVerificationEmail: async (req,res) => {
+        console.log('hit')
         try{
             const {email} = req.body
-            const repsonse = await getToken(email)
+            const response = await getTokenHandler(email)
+            console.log(response.token)
             const msg = {
                 to: email,
                 from: 'no-reply@crackhire.com',
                 subject: 'Verify Your Email',
-                html: `Click <a href="${eamilUrl}/verification?token=${response.token}&email=${email}">here</a> to verify your email.`
+                html: `<p>Visit below link to to verify your email</p><p>${emailUrl}?token=${response.token}&email=${email}</p> `
             };
             sgMail.send(msg);
             res.end()
@@ -23,9 +25,12 @@ module.exports = {
     }, 
 
     verifyEmail: async (req,res) => {
-        const {token, email} = req.query
         try {
-            const response = await checkToken(token)
+            const {email, token} = req.query
+            const response = await checkTokenHandler(token)
+            if(response.decoded.email !== email) {
+                throw new Error()
+            }
             await emailVerifiedHandler(email)
             res.json({
                 status: true,
@@ -68,12 +73,14 @@ const getUser = async (email) => {
     return await rp(options)
 }
 
-const getToken = async (email) => {
+const getTokenHandler = async (email) => {
     options = {
         method: 'GET',
         uri: `${services.auth}/authorize`,
         body: {
-            email,
+            payload:{
+                email
+            },
             expiresin: '10min'
         },
         json: true
@@ -81,10 +88,13 @@ const getToken = async (email) => {
     return await rp(options)
 }
 
-const checkToken = async (email) => {
+const checkTokenHandler = async (token) => {
     options = {
         method: 'GET',
         uri: `${services.auth}/check`,
+        body: {
+            token
+        },
         json: true
     }
     return await rp(options)

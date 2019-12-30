@@ -1,5 +1,4 @@
 const express = require('express')
-require('dotenv').config()
 
 const app = express()
 app.use(express.json())
@@ -9,18 +8,7 @@ const PORT = process.env.port || 3000
 const router = require('./routes/api')
 app.use(router)
 
-require('./db/connection')()
-    .then( async(con) => {
-        try{
-            await con.query(`SET sql_mode = ""`);
-            await con.close()
-            app.listen(PORT, () => {
-                console.log(`service: |Signup| online on port ${PORT}`)
-            }) 
-        } catch(err) {
-            console.log('cannot catch connection' , err)
-        }
-    })
-    .catch(err => {
-        console.log('cannot connect to db' , err)
-    })
+app.listen(PORT, () => {
+    console.log(`service: |Signup| online on port ${PORT}`)
+})
+ 

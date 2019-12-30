@@ -4,7 +4,7 @@ const user = require('../controllers/userController')
 router.get('/ping', (req,res) => res.send('pong'))
 
 
-router.get('/send_verificaton', user.sendVerificationEmail)
+router.get('/send_verification', user.sendVerificationEmail)
 
 router.get('/check_verification', user.verifyEmail)
 

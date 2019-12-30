@@ -1,5 +1,4 @@
 const auth = require('../utils/jwt')
-const bcrypt = require('bcryptjs')
 
 module.exports = {
 
@@ -22,7 +21,7 @@ module.exports = {
   },
 
   verifyToken: async (req, res) => {
-    const token = req.header["x-access-token"] || req.header["authorization"] || req.query["token"];
+    const token = req.header["x-access-token"] || req.header["authorization"] || req.query["token"] || req.body["token"];
     if (token.startsWith("Bearer ")) {
       token = token.slice(7, token.length);
     }

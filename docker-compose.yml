@@ -88,11 +88,8 @@ services:
             - ./services/sms:/app
         env_file: 
             - ./services/sms/config/dev.env
+        depends_on:
+            - db
 
 volumes:
     data:
-        # login signup forgotpass/resetpass 
-        # abhi ke liye sirf ek login ko leke chalo, ex. jobseeker
-        # ask utkarsh about how node code should look like : ex. database by migrations or simple, login system
-        # code acha likna hai
-        # daily report on progress

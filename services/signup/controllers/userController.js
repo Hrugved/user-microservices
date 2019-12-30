@@ -5,15 +5,21 @@ const constants = require('../constants')
 module.exports = {
     register: async(req,res) => { 
         try {
+            let {
+                name,
+                email,
+                password,
+                phone
+            } = req.body; 
             const response = await createUserHandler({
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                phone: req.body.phone 
+                name,
+                email,
+                password,
+                phone
             });
-            
-            // TODO create sendOtp func
-            sendOtpHandler(phone)
+            // console.log(response)
+
+            // sendOtpHandler(phone)
             sendVerificationMailHandler(email)
 
             return res.status(200).json({
@@ -23,12 +29,13 @@ module.exports = {
         }
 
         catch(err) {
-            if(err.statusCode === '404') {
-                return res.status(404).send({
+            if(err.statusCode === 404) {
+                return res.status(404).json({
                     status: false,
-                    message: 'User is already regitered'
+                    message: 'User is already registered'
                 })
             }
+            console.log(err)
             return res.status(500).json({
                 status : false,
                 message : "Cannot create user"
@@ -42,7 +49,7 @@ module.exports = {
             await verifyOtpHandler(phone,otp)
             await updateUserStatusHandler(phone)
             res.json({
-                status: false,
+                status: true,
                 message: 'Otp verified. User registered successfully'
             })
         } catch(err) {
@@ -52,7 +59,7 @@ module.exports = {
                     message: 'invalid otp'
                 })
             }
-            console.log('error')
+            console.log(err)
             return res.status(500).json({
                 status: false,
                 message: 'service error'
@@ -65,6 +72,7 @@ module.exports = {
 
 const sendVerificationMailHandler = async (email) => {
     try {
+        console.log('signup func')
         const options = {
             method: 'GET',
             uri: `${services.email}/send_verification`,
