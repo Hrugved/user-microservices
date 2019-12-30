@@ -6,6 +6,8 @@ router.get('/ping', (req,res) => res.send('pong'))
 // login
 router.post('/login', user.login)
 
+router.post('/login_otp', user.loginByOtp)
+
 // signup
 router.post('/', user.create)
 

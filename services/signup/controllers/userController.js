@@ -1,5 +1,6 @@
 const rp = require('request-promise')
 const services = require('../services')
+const constants = require('../constants')
 
 module.exports = {
     register: async(req,res) => { 
@@ -40,6 +41,10 @@ module.exports = {
             const {phone,otp} = req.body
             await verifyOtpHandler(phone,otp)
             await updateUserStatusHandler(phone)
+            res.json({
+                status: false,
+                message: 'Otp verified. User registered successfully'
+            })
         } catch(err) {
             if(err.statusCode === '400') {
                 return res.json(404).json({
@@ -120,7 +125,7 @@ const updateUserStatusHandler = async(phone) => {
             user: {
                 phone
             }, updates: {
-                status: 1
+                status: constants.STATUS.ACTIVE 
             }
         },
         json: true

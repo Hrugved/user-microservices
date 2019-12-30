@@ -19,7 +19,8 @@ module.exports = {
             })
             res.json({
                 status: true,
-                message: 'otp sent successfully'
+                message: 'otp sent successfully',
+                phone
             })
         } catch(err) {
             console.error(err)
