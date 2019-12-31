@@ -1,9 +1,6 @@
 const rp = require('request-promise')
 const constants = require('../constants')
 
-const signupService = 'http://signup:3000'
-const emailService = 'http://email:3002'
-
 module.exports = {
   reset: async (req,res) => {
     try {  

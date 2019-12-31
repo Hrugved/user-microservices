@@ -3,8 +3,7 @@ const rp = require('request-promise')
 module.exports = {
     sendOtp: async (req,res) => {
         try{
-            const {phone} = req.body
-            console.log(`+91${phone}`)
+            let {phone} = req.body
             let users = await req.models.otp.findOrCreate({
                 where: {
                     phone
@@ -17,11 +16,11 @@ module.exports = {
                 otp, 
                 otpCreatedAt: Date.now() 
             })
-            // await req.client.messages.create({
-            //     body: `Your otp for crackhire account is ${otp}`,
-            //     from: process.env.TWILIO_PHONE,
-            //     to: `+91${phone}`
-            // })
+            await req.client.messages.create({
+                body: `Your otp for crackhire account is ${otp}`,
+                from: process.env.TWILIO_PHONE,
+                to: `+91${phone}`
+            })
             res.json({
                 status: true,
                 message: 'otp sent successfully',
@@ -29,7 +28,7 @@ module.exports = {
             })
         } catch(err) {
             console.error(err)
-            if(err.statusCode === 400){
+            if(err.status === 400){
                 res.status(400).json({
                     status: false,
                     message: 'cannot sent otp, please check if phone-number is valid'
@@ -54,6 +53,7 @@ module.exports = {
             if(user.otpCreatedAt - Date.now() >  5*60*100) { //5min
                 throw err
             }
+            await user.destroy()
             res.json({
                 status: true,
                 message: 'otp verified successfully'

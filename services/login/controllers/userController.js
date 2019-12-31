@@ -1,83 +1,95 @@
 const rp = require('request-promise')
 const bcrypt = require('bcryptjs')
 const constants = require('../constants')
+const services = require('../services')
 
 module.exports = {
 
     // login options: 
     //    - email/phone + password/otp
+    //    - if password is not provided => login by OTP
     login: async (req,res) => {
         try {
             let {email=null,phone=null,password=null} = req.body
             if(!(email || phone)) {
-                throw new Error('email or phone required')
+                throw new clientError('email or phone required')
             }
+            let user
             if(email) {
-                const user = req.models.user.findOne({
-                    email
+                user = await req.models.user.findOne({
+                    where: { email }
                 })
             } else {
-                const user = req.models.user.findOne({
-                    phone   
+                user = await req.models.user.findOne({
+                    where: { phone }   
                 })
             }
             if(!user) {
-                throw new Error('invalid user credentials')
+                throw new clientError('invalid user credentials')
             }
+            // console.log(user)
             if(user.status === constants.STATUS.PENDING_ACTIVATION) {
-                throw new Error('Account registration is incomplete. Complete your phone verification.')
+                throw new clientError('Account registration is incomplete. Complete your phone verification.')
             }
             if(user.status === constants.STATUS.BLOCKED) {
-                throw new Error('Account is blocked.')
+                throw new clientError('Account is blocked.')
             }
             if(password) {
                 // login with password  
-                // TODO hande if password invalid
-                await bcrypt.compare(password,user.password)
+                if(!(await bcrypt.compare(password,user.password))) {
+                    throw new clientError('invalid user credentials')
+                }
                 const response = await getAuthTokenHandler(user)
                 return res.send({
                     status: true,
-                    token
+                    token: response.token
                 }) 
             } else {
                 // login with otp
-                await sendOtpHandler(phone)
+                await sendOtpHandler(user.phone)
+
                 return res.json({
                     status: true,
                     message: 'Check phone for otp',
-                    phone
+                    phone: user.phone
                 })
             }
 
         } catch(err) {
             console.log(err)
-            // TODO check handling of code Error 
-            if(err.name == 'Error') {
-                return res.status(404).json({
+            if(err.name == 'clientError') {
+                return res.status(400).json({
                     status: false,
                     message: err.message
                 })
             }
+            res.status(500).json({
+                status: false,
+                message: 'service failure'
+            })
         }
     },
 
     loginByOtp: async(req,res) => {
+        console.log('login_otp hit')
         try {
             const {phone,otp} = req.body
+            const user = await req.models.user.findOne({ where: {phone}})
             let response = await verifyOtpHandler(phone,otp)
             response = await getAuthTokenHandler(user)
             return res.json({
                 status: true,
-                token
+                token: response.token
             }) 
         } catch(err) {
+            console.log(err)
             if(err.statusCode === 400) {
                 return res.status(400).json({
                     status: false,
                     message: 'invalid otp'
                 })
             }
-            res.status.json({
+            res.status(500).json({
                 status: false,
                 message: 'login failed'
             })
@@ -92,11 +104,18 @@ module.exports = {
                 password,
                 phone
             } = req.body; 
-            const existingUser = await req.models.user.findOne({ where: {phone}})
+            let existingUser = await req.models.user.findOne({ where: {phone}})
             if(existingUser) {
                 return res.status(404).json({
                     status : false,
-                    message : "User already exists"
+                    message : "User with this phone is already registered"
+                })
+            }
+            existingUser = await req.models.user.findOne({ where: {email}})
+            if(existingUser) {
+                return res.status(404).json({
+                    status : false,
+                    message : "User with this email is already registered"
                 })
             }
             password = await bcrypt.hash(password,8)
@@ -166,7 +185,7 @@ module.exports = {
             }
 
             const users = await req.models.user.update(updates, {where:user}) 
-            res.json({status: true, users: users.length})
+            res.json({status: true, users: users.length, updated: Object.keys(updates)})
         }
         catch(err) {
             console.log(err)
@@ -194,6 +213,7 @@ getAuthTokenHandler = async (user) => {
 }
 
 const sendOtpHandler = async(phone) => {
+    console.log(services.sms)
     const options = {
         method: 'GET',
         uri: `${services.sms}/send_otp`,
@@ -216,4 +236,14 @@ const verifyOtpHandler = async(phone,otp) => {
         json: true
     }
     return rp(options)
+}
+
+class clientError extends Error {
+    constructor(message = 'client side error') {
+        super(message)
+        this.name = 'clientError'
+    }
+    throw() {
+        throw this
+    }
 }

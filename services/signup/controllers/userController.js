@@ -32,7 +32,7 @@ module.exports = {
             if(err.statusCode === 404) {
                 return res.status(404).json({
                     status: false,
-                    message: 'User is already registered'
+                    message: err.error.message
                 })
             }
             console.log(err)
