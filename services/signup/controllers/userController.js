@@ -69,6 +69,7 @@ module.exports = {
 
     resendOtp: async(req,res) => {
         sendOtpHandler(req.body.phone)
+        res.end()
     }
 }
 
