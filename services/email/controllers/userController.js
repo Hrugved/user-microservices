@@ -59,20 +59,6 @@ module.exports = {
     } 
 }
 
-const getUserHandler = async (email) => {
-    let options = {
-        method: 'GET',
-        uri: services.login,
-        body: {
-            options: {
-                email
-            }
-        },
-        json: true
-    }
-    return rp(options)
-}
-
 const getTokenHandler = async (email) => {
     options = {
         method: 'GET',
