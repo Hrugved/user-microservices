@@ -1,32 +1,34 @@
 const rp = require('request-promise')
 const constants = require('../constants')
+const services = require('../services')
 
 module.exports = {
   reset: async (req,res) => {
     try {  
       const {email} = req.body 
-      // check if user exists
       let response = await getUserHandler(email)
-      if(!response.status) {
-        return res.json({
-          status: false,
-          message: 'invalid use credentials'
-        })
-      }
-      response = await getAuthTokenHandler(email)
-      const entry = await req.models.resetToken.findOrCreate({
-        email
+      const otp = Math.floor(Math.random() * 900000) + 100000;
+      response = await getAuthTokenHandler(email, otp)
+      let entry = await req.models.resetToken.findOrCreate({
+        where: {email}
       })
-      await entry.update({token: response.token})
-      sendResetPasswordMailHandler(entry.email,entry.token)
+      entry = entry[0]
+      await entry.update({otp})
+      sendResetPasswordMailHandler(entry.email,response.token)
       res.json({
-        success: true,
+        status: true,
         message: 'check email for password reset link'
       })
     } catch(err) {
+      if(err.statusCode === 404) {
+        return res.json({
+          status: false,
+          message: 'invalid user credentials'
+        }) 
+      }
       console.log(err)
       res.status(500).json({
-        success: false,
+        status: false,
         message: 'service failed'
       })
     }
@@ -35,33 +37,29 @@ module.exports = {
   set: async (req,res) => {
     try {
       const {email,token,password} = req.body
-      // check if token exists
       let p1 = req.models.resetToken.findOne({
         where: {
-          token,
           email
         }
       })
-      // check if token is valid
       let p2 = checkAuthTokenHandler(token)
       let [entry, response] = await Promise.all([p1,p2])
-      if(!(entry)) {
+      if(!(entry) || (response.decoded.email !== entry.email || response.decoded.otp !== entry.otp)) {
         return res.status(404).json({
-          success: false,
+          status: false,
           message: 'token is invalid'
         })
       }
       await updatePasswordHandler(email,password)
-      // delete entry
       await entry.destroy()
       res.json({
-        success: true,
-        message: 'password is reset successfully'
+        status: true,
+        message: 'password reset successfully'
       })
     } catch(err) {
       console.log(err)
       res.status(500).json({
-        success: false
+        status: false
       })
     }
   }
@@ -70,7 +68,7 @@ module.exports = {
 const sendResetPasswordMailHandler = (email,token) => {
     const options = {
         method: 'POST',
-        uri: `${services.email}/reset_password`,
+        uri: `${services.email}/send_reset_password`,
         body: {
             email,
             token
@@ -108,13 +106,14 @@ const updatePasswordHandler = async(email,password) => {
   return rp(options)
 }
 
-const getAuthTokenHandler = (email) => {
+const getAuthTokenHandler = (email,otp) => {
   options = {
       method: 'GET',
       uri: `${services.auth}/authorize`,
       body: {
           payload:{
-              email
+              email,
+              otp
           },
           expiresIn: '10m'
       },
@@ -124,7 +123,7 @@ const getAuthTokenHandler = (email) => {
   return rp(options)
 }
 
-const checkAuthTokenHandler = () => {
+const checkAuthTokenHandler = (token) => {
   const options = {
     method: 'GET',
     uri: `${services.auth}/check`,

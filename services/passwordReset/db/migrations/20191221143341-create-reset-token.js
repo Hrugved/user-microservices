@@ -12,8 +12,8 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
-      token: {
-        type: Sequelize.STRING
+      otp: {
+        type: Sequelize.BIGINT
       },
       createdAt: {
         allowNull: false,

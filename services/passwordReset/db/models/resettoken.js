@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
-    token: DataTypes.STRING
+    otp: DataTypes.BIGINT
   }, {});
   resetToken.associate = function(models) {
     // associations can be defined here

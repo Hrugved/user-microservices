@@ -38,19 +38,6 @@ services:
             - /app/node_modules
             - ./services/login:/app
 
-    email:
-        container_name: email
-        build:
-            context: ./services/email
-            dockerfile: Dockerfile.dev
-        ports:
-            - 3004:3004
-        volumes:
-            - /app/node_modules
-            - ./services/email:/app
-        env_file: 
-            - ./services/email/config/dev.env
-            
 
     password_reset:
         container_name: password_reset
@@ -64,7 +51,7 @@ services:
             - ./services/passwordReset:/app
         depends_on:
             - db
-    
+
     auth:
         container_name: auth 
         build:
@@ -76,6 +63,19 @@ services:
             - /app/node_modules
             - ./services/auth:/app
 
+    email:
+        container_name: email
+        build:
+            context: ./services/email
+            dockerfile: Dockerfile.dev
+        ports:
+            - 3004:3004
+        volumes:
+            - /app/node_modules
+            - ./services/email:/app
+        env_file: 
+            - ./services/email/config/dev.env
+            
     sms:
         container_name: sms
         build:

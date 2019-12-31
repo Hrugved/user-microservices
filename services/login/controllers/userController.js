@@ -149,7 +149,7 @@ module.exports = {
         try{
             const user = await req.models.user.findOne({where: options})
             if(!user) {
-                return res.json({
+                return res.status(404).json({
                     status: false,
                     message: 'no such user exists'
                 })

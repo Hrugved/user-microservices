@@ -52,7 +52,7 @@ module.exports = {
             to: email,
             from: 'no-reply@crackhire.com',
             subject: 'Reset password link',
-            html: `Click ${passwordResetService}/set_password?token=${token}&email=${email} to reset your password `
+            html: `Click {link_to_page_where_user_can_enter_new_password}/set_password?token=${token}&email=${email} to reset your password `
           };
           sgMail.send(msg);
           res.end() 
