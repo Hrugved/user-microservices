@@ -209,7 +209,7 @@ getAuthTokenHandler = async (user) => {
         },
         json: true
     }
-    return await rp(options)
+    return rp(options)
 }
 
 const sendOtpHandler = async(phone) => {

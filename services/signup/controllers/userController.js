@@ -19,7 +19,7 @@ module.exports = {
             });
             // console.log(response)
 
-            // sendOtpHandler(phone)
+            sendOtpHandler(phone)
             sendVerificationMailHandler(email)
 
             return res.status(200).json({
@@ -65,6 +65,10 @@ module.exports = {
                 message: 'service error'
             })
         }
+    },
+
+    resendOtp: async(req,res) => {
+        sendOtpHandler(req.body.phone)
     }
 }
 

@@ -50,7 +50,7 @@ module.exports = {
                     otp
                 }
             })
-            if(user.otpCreatedAt - Date.now() >  5*60*100) { //5min
+            if(!user && user.otpCreatedAt - Date.now() >  5*60*100) { //5min
                 throw err
             }
             await user.destroy()

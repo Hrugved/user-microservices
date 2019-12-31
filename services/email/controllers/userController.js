@@ -59,7 +59,7 @@ module.exports = {
     } 
 }
 
-const getUser = async (email) => {
+const getUserHandler = async (email) => {
     let options = {
         method: 'GET',
         uri: services.login,
@@ -70,7 +70,7 @@ const getUser = async (email) => {
         },
         json: true
     }
-    return await rp(options)
+    return rp(options)
 }
 
 const getTokenHandler = async (email) => {
@@ -85,7 +85,7 @@ const getTokenHandler = async (email) => {
         },
         json: true
     }
-    return await rp(options)
+    return rp(options)
 }
 
 const checkTokenHandler = async (token) => {
@@ -97,7 +97,7 @@ const checkTokenHandler = async (token) => {
         },
         json: true
     }
-    return await rp(options)
+    return rp(options)
 }
 
 const emailVerifiedHandler = async (email) => {
@@ -114,5 +114,5 @@ const emailVerifiedHandler = async (email) => {
         },
         json: true
     }
-    return await rp(options)
+    return rp(options)
 }
