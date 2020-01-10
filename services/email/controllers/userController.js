@@ -6,11 +6,9 @@ const emailUrl = 'localhost:3004/check_verification'
 
 module.exports = {
     sendVerificationEmail: async (req,res) => {
-        console.log('hit')
         try{
             const {email} = req.body
             const response = await getTokenHandler(email)
-            console.log(response.token)
             const msg = {
                 to: email,
                 from: 'no-reply@crackhire.com',

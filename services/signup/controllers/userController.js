@@ -17,7 +17,6 @@ module.exports = {
                 password,
                 phone
             });
-            // console.log(response)
 
             sendOtpHandler(phone)
             sendVerificationMailHandler(email)
@@ -77,7 +76,6 @@ module.exports = {
 
 const sendVerificationMailHandler = async (email) => {
     try {
-        console.log('signup func')
         const options = {
             method: 'GET',
             uri: `${services.email}/send_verification`,

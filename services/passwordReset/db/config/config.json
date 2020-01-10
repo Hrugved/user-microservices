@@ -3,7 +3,7 @@
     "username": "root",
     "password": "mysql_password",
     "database": "database_development",
-    "host": "db",
+    "host": "password_reset_db",
     "dialect": "mysql"
   },
   "test": {
