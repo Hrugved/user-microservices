@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+    
+    login_db:
+        container_name: login_db
+        build:
+            context: ./services/login/db
+            dockerfile: Dockerfile.dev
+        volumes:
+            - login_db_data:/var/lib/mysql
+        environment: 
+            MYSQL_ROOT_PASSWORD: mysql_password # default user: root
+        ports:
+            - 8081:3306 # mysql workbench -> host: localhost:8080, user: root, password: mysql_password 
+      
+volumes:
+    login_db_data:
